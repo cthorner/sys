@@ -9,10 +9,12 @@ git = "https://github.com/cthorner/cairo"
 # git = "https://github.com/gtk-rs/cairo"
 
 [dependencies.glib-sys]
-path = "../glib-sys"
+git = "https://github.com/cthorner/sys"
+# path = "../glib-sys"
 
 [dependencies.pango-sys]
-path = "../pango-sys"
+git = "https://github.com/cthorner/sys"
+# path = "../pango-sys"
 
 [dev-dependencies]
 shell-words = "0.1.0"
