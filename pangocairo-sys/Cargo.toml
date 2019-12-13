@@ -5,7 +5,8 @@ pkg-config = "0.3.7"
 libc = "0.2"
 
 [dependencies.cairo-sys-rs]
-git = "https://github.com/gtk-rs/cairo"
+git = "https://github.com/cthorner/cairo"
+# git = "https://github.com/gtk-rs/cairo"
 
 [dependencies.glib-sys]
 path = "../glib-sys"
