@@ -2,9 +2,12 @@
 pkg-config = "0.3.7"
 
 [dependencies]
-cairo-sys-rs = "0.9.0"
-glib-sys = "0.9.0"
-pango-sys = "0.9.0"
+# cairo-sys-rs = "0.9.0"
+cairo-sys-rs = { git = "https://github.com/cthorner/cairo", branch="0.7-custom" }
+# glib-sys = "0.9.0"
+glib-sys = { git = "https://github.com/cthorner/sys", branch="crate-custom", version = "0.9.0" }
+# pango-sys = "0.9.0"
+pango-sys = { git = "https://github.com/cthorner/sys", branch="crate-custom", version = "0.9.0" }
 libc = "0.2"
 
 [dev-dependencies]

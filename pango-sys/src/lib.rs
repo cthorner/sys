@@ -2199,6 +2199,8 @@ extern "C" {
     // PangoFontMap
     //=========================================================================
     pub fn pango_font_map_get_type() -> GType;
+    pub fn pango_fc_font_map_config_changed(fontmap: *mut PangoFontMap);
+    pub fn pango_fc_font_map_cache_clear(fontmap: *mut PangoFontMap);
     pub fn pango_font_map_changed(fontmap: *mut PangoFontMap);
     pub fn pango_font_map_create_context(fontmap: *mut PangoFontMap) -> *mut PangoContext;
     pub fn pango_font_map_get_serial(fontmap: *mut PangoFontMap) -> c_uint;
