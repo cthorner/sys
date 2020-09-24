@@ -6,15 +6,12 @@ libc = "0.2"
 
 [dependencies.cairo-sys-rs]
 git = "https://github.com/cthorner/cairo"
-# git = "https://github.com/gtk-rs/cairo"
 
 [dependencies.glib-sys]
 git = "https://github.com/cthorner/sys"
-# path = "../glib-sys"
 
 [dependencies.pango-sys]
 git = "https://github.com/cthorner/sys"
-# path = "../pango-sys"
 
 [dev-dependencies]
 shell-words = "0.1.0"
@@ -37,13 +34,10 @@ links = "pango_cairo"
 name = "pangocairo-sys"
 repository = "https://github.com/gtk-rs/sys"
 version = "0.11.0"
-
 [package.metadata.docs.rs]
 features = ["dox"]
-
 [package.metadata.system-deps.pangocairo]
 name = "pangocairo"
 version = "1.36"
 
 [package.metadata.system-deps.pangocairo.feature-versions]
-
