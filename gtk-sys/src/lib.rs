@@ -810,7 +810,7 @@ pub const GTK_PRINT_SETTINGS_WIN32_DRIVER_EXTRA: *const c_char =
     b"win32-driver-extra\0" as *const u8 as *const c_char;
 pub const GTK_PRINT_SETTINGS_WIN32_DRIVER_VERSION: *const c_char =
     b"win32-driver-version\0" as *const u8 as *const c_char;
-pub const GTK_PRIORITY_RESIZE: c_int = 10;
+pub const GTK_PRIORITY_RESIZE: c_int = 110;
 pub const GTK_STOCK_ABOUT: *const c_char = b"gtk-about\0" as *const u8 as *const c_char;
 pub const GTK_STOCK_ADD: *const c_char = b"gtk-add\0" as *const u8 as *const c_char;
 pub const GTK_STOCK_APPLY: *const c_char = b"gtk-apply\0" as *const u8 as *const c_char;
@@ -1074,7 +1074,7 @@ pub const GTK_STYLE_REGION_COLUMN_HEADER: *const c_char =
     b"column-header\0" as *const u8 as *const c_char;
 pub const GTK_STYLE_REGION_ROW: *const c_char = b"row\0" as *const u8 as *const c_char;
 pub const GTK_STYLE_REGION_TAB: *const c_char = b"tab\0" as *const u8 as *const c_char;
-pub const GTK_TEXT_VIEW_PRIORITY_VALIDATE: c_int = 5;
+pub const GTK_TEXT_VIEW_PRIORITY_VALIDATE: c_int = 125;
 pub const GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID: c_int = -1;
 pub const GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID: c_int = -2;
 
@@ -2679,6 +2679,26 @@ pub struct GtkCellAccessibleParentIface {
             *mut atk::AtkRelationSet,
         ),
     >,
+    pub get_cell_position: Option<
+        unsafe extern "C" fn(
+            *mut GtkCellAccessibleParent,
+            *mut GtkCellAccessible,
+            *mut c_int,
+            *mut c_int,
+        ),
+    >,
+    pub get_column_header_cells: Option<
+        unsafe extern "C" fn(
+            *mut GtkCellAccessibleParent,
+            *mut GtkCellAccessible,
+        ) -> *mut glib::GPtrArray,
+    >,
+    pub get_row_header_cells: Option<
+        unsafe extern "C" fn(
+            *mut GtkCellAccessibleParent,
+            *mut GtkCellAccessible,
+        ) -> *mut glib::GPtrArray,
+    >,
 }
 
 impl ::std::fmt::Debug for GtkCellAccessibleParentIface {
@@ -2697,6 +2717,9 @@ impl ::std::fmt::Debug for GtkCellAccessibleParentIface {
         .field("activate", &self.activate)
         .field("edit", &self.edit)
         .field("update_relationset", &self.update_relationset)
+        .field("get_cell_position", &self.get_cell_position)
+        .field("get_column_header_cells", &self.get_column_header_cells)
+        .field("get_row_header_cells", &self.get_row_header_cells)
         .finish()
     }
 }
@@ -5058,6 +5081,28 @@ impl ::std::fmt::Debug for GtkHandleBoxClass {
 pub struct _GtkHandleBoxPrivate(c_void);
 
 pub type GtkHandleBoxPrivate = *mut _GtkHandleBoxPrivate;
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct GtkHeaderBarAccessibleClass {
+    pub parent_class: GtkContainerAccessibleClass,
+}
+
+impl ::std::fmt::Debug for GtkHeaderBarAccessibleClass {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        f.debug_struct(&format!(
+            "GtkHeaderBarAccessibleClass @ {:?}",
+            self as *const _
+        ))
+        .field("parent_class", &self.parent_class)
+        .finish()
+    }
+}
+
+#[repr(C)]
+pub struct _GtkHeaderBarAccessiblePrivate(c_void);
+
+pub type GtkHeaderBarAccessiblePrivate = *mut _GtkHeaderBarAccessiblePrivate;
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -12493,6 +12538,20 @@ impl ::std::fmt::Debug for GtkHeaderBar {
 
 #[repr(C)]
 #[derive(Copy, Clone)]
+pub struct GtkHeaderBarAccessible {
+    pub parent: GtkContainerAccessible,
+}
+
+impl ::std::fmt::Debug for GtkHeaderBarAccessible {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        f.debug_struct(&format!("GtkHeaderBarAccessible @ {:?}", self as *const _))
+            .field("parent", &self.parent)
+            .finish()
+    }
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct GtkIMContext {
     pub parent_instance: gobject::GObject,
 }
@@ -19817,6 +19876,11 @@ extern "C" {
     pub fn gtk_header_bar_set_title(bar: *mut GtkHeaderBar, title: *const c_char);
 
     //=========================================================================
+    // GtkHeaderBarAccessible
+    //=========================================================================
+    pub fn gtk_header_bar_accessible_get_type() -> GType;
+
+    //=========================================================================
     // GtkIMContext
     //=========================================================================
     pub fn gtk_im_context_get_type() -> GType;
@@ -21310,7 +21374,7 @@ extern "C" {
     pub fn gtk_overlay_reorder_overlay(
         overlay: *mut GtkOverlay,
         child: *mut GtkWidget,
-        position: c_int,
+        index_: c_int,
     );
     #[cfg(any(feature = "v3_18", feature = "dox"))]
     pub fn gtk_overlay_set_overlay_pass_through(
@@ -25989,14 +26053,28 @@ extern "C" {
         height: *mut c_int,
         coord_type: atk::AtkCoordType,
     );
+    pub fn gtk_cell_accessible_parent_get_cell_position(
+        parent: *mut GtkCellAccessibleParent,
+        cell: *mut GtkCellAccessible,
+        row: *mut c_int,
+        column: *mut c_int,
+    );
     pub fn gtk_cell_accessible_parent_get_child_index(
         parent: *mut GtkCellAccessibleParent,
         cell: *mut GtkCellAccessible,
     ) -> c_int;
+    pub fn gtk_cell_accessible_parent_get_column_header_cells(
+        parent: *mut GtkCellAccessibleParent,
+        cell: *mut GtkCellAccessible,
+    ) -> *mut glib::GPtrArray;
     pub fn gtk_cell_accessible_parent_get_renderer_state(
         parent: *mut GtkCellAccessibleParent,
         cell: *mut GtkCellAccessible,
     ) -> GtkCellRendererState;
+    pub fn gtk_cell_accessible_parent_get_row_header_cells(
+        parent: *mut GtkCellAccessibleParent,
+        cell: *mut GtkCellAccessible,
+    ) -> *mut glib::GPtrArray;
     pub fn gtk_cell_accessible_parent_grab_focus(
         parent: *mut GtkCellAccessibleParent,
         cell: *mut GtkCellAccessible,
